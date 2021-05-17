@@ -92,13 +92,14 @@ def merge_lines_single_file(options):
             last_line = current_line
             
         # Compute data for the final line
-        last_line = [ concat_condition(x) for x in range(len(last_line)) ]
-        _ = last_line.append(str(counter)) if sum_field_required else last_line
-        _ = last_line.append(str(merge_counter)) if add_merge_counter else last_line
+        if last_line:
+            last_line = [ concat_condition(x) for x in range(len(last_line)) ]
+            _ = last_line.append(str(counter)) if sum_field_required else last_line
+            _ = last_line.append(str(merge_counter)) if add_merge_counter else last_line
             
         
-        # Print the last line
-        dump_data(last_line, field_separator, output_stream)
+            # Print the last line
+            dump_data(last_line, field_separator, output_stream)
 
         # Close the streams
         input_stream.close()
