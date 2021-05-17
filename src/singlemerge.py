@@ -35,6 +35,14 @@ import os, sys
 
 # ----------------------------------------- Functions ---------------------------------------------
 
+# -- Function: get_input_file_lines
+# Generator to open large files
+#
+def get_input_file_lines(input_stream):
+    for line in input_stream:
+        yield line        
+
+
 # -- Function: merge_lines_single_file
 # A function to perform the merge the keys into single lines
 #
@@ -61,7 +69,7 @@ def merge_lines_single_file(options):
         concat_condition = lambda x: concat_separator.join(concat_dict[str(x)]) if (x in concat_list) else last_line[x]
         
         # Process data
-        for line in input_stream:
+        for line in get_input_file_lines(input_stream):
             current_line = line.strip('\n').split(field_separator)
             
             # Just skip the first line of the iteration
