@@ -48,6 +48,7 @@ def merge_lines_single_file(options):
         concat_list = [int(x) - 1 for x in options.concat_fields ] if options.concat_fields else [] 
         concat_separator = options.concat_separator
         skip_headers = True if str(options.skip_header).lower().find('true') != -1 else False
+        add_merge_counter = True if str(options.append_counter.lower().find('true')) != -1 else False
         sum_field = int(options.sum_value[0]) - 1 if options.sum_value else None
         sum_lookup = options.sum_value[1] if options.sum_value else None  
         sum_field_required = True if sum_field and sum_lookup else False
@@ -56,6 +57,7 @@ def merge_lines_single_file(options):
         last_line = None
         concat_dict = {}
         counter = 0
+        merge_counter = 0
         concat_condition = lambda x: concat_separator.join(concat_dict[str(x)]) if (x in concat_list) else last_line[x]
         
         # Process data
@@ -70,7 +72,9 @@ def merge_lines_single_file(options):
             elif last_line and last_line[key_field].find(current_line[key_field]) == -1:
                 # Process the data from previous line
                 last_line = [ concat_condition(x) for x in range(len(last_line)) ]
-                last_line = last_line.append(str(counter)) if sum_field_required else last_line
+                _ = last_line.append(str(counter)) if sum_field_required else last_line
+                _ = last_line.append(str(merge_counter)) if add_merge_counter else last_line
+                merge_counter = 0
                
                 # Print the formatted line
                 dump_data(last_line, field_separator, output_stream)
@@ -82,15 +86,17 @@ def merge_lines_single_file(options):
             # Concatenate and sum fields for the current line
             concat_dict = concatenate_in_fields(concat_dict, concat_list, current_line)
             counter = counter + 1 if sum_field_required and current_line[sum_field].find(sum_lookup) != -1 else counter
+            merge_counter += 1
                     
             # Next iteration
             last_line = current_line
             
         # Compute data for the final line
         last_line = [ concat_condition(x) for x in range(len(last_line)) ]
-        if sum_field_required:
-            last_line.append(str(counter))
+        _ = last_line.append(str(counter)) if sum_field_required else last_line
+        _ = last_line.append(str(merge_counter)) if add_merge_counter else last_line
             
+        
         # Print the last line
         dump_data(last_line, field_separator, output_stream)
 
@@ -143,7 +149,7 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--merge-field", dest='concat_fields', metavar="FIELD", help="List of fields concatenate", nargs="*")
     parser.add_argument("-f", "--merge-separator", dest='concat_separator', metavar="SEPARATOR", help="The separator for concatenated lines")
     parser.add_argument("-v", "--sum-value", dest='sum_value', type=str, metavar=("FIELD","STRING"), help="The field to concatenate", nargs=2)
-    parser.add_argument("-x", "--append-counter", dest='append_counter', metavar=("true|false"), help="Whehter include a field with the counter of merged lines or not. Default = \"false\"", default="false") #TODO
+    parser.add_argument("-c", "--count-merged-lines", dest='append_counter', metavar=("true|false"), help="Whehter include a field with the counter of merged lines or not. Default = \"false\"", default="false")
     parser.add_argument("-s", "--skip-header", dest='skip_header', metavar="true|false", default='false', help="true to skip the first line of the file, false otherwise. Default = \"false\"")
 
     options = parser.parse_args()
