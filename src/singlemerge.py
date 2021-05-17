@@ -143,6 +143,7 @@ if __name__ == '__main__':
     parser.add_argument("-m", "--merge-field", dest='concat_fields', metavar="FIELD", help="List of fields concatenate", nargs="*")
     parser.add_argument("-f", "--merge-separator", dest='concat_separator', metavar="SEPARATOR", help="The separator for concatenated lines")
     parser.add_argument("-v", "--sum-value", dest='sum_value', type=str, metavar=("FIELD","STRING"), help="The field to concatenate", nargs=2)
+    parser.add_argument("-x", "--append-counter", dest='append_counter', metavar=("true|false"), help="Whehter include a field with the counter of merged lines or not. Default = \"false\"", default="false") #TODO
     parser.add_argument("-s", "--skip-header", dest='skip_header', metavar="true|false", default='false', help="true to skip the first line of the file, false otherwise. Default = \"false\"")
 
     options = parser.parse_args()
